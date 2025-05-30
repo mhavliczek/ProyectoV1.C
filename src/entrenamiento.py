@@ -1,0 +1,177 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from scipy.stats import randint, uniform
+import joblib
+import os
+import numpy as np
+import time
+
+# ==============================
+# CONFIGURACIÓN
+# ==============================
+DATA_PATH = "data/datos_generados_Disponibilidad.parquet"
+MODEL_PATH = "data/modelo_entrenado.joblib"
+FEATURES_PATH = "data/feature_names.joblib"
+METRICS_PATH = "data/metricas_modelo.csv"
+
+# Cargar datos
+def cargar_datos():
+    if not os.path.exists(DATA_PATH):
+        raise FileNotFoundError(f"No se encontró el archivo {DATA_PATH}")
+    return pd.read_parquet(DATA_PATH)
+
+# Preprocesamiento
+def preprocesar_datos(df):
+    # Eliminar columnas irrelevantes
+    columnas_a_eliminar = [
+        "Fecha", "flota", "cambioLubricanate", "Código ISO 4406",
+        "Numero Muestra", "Numero Registro", "Numero Serie Equipo",
+        "Confiabilidad", "Disponibilidad", "TBF", "TRR", "TMP",
+        "Tiempo Parada", "Modelo"
+    ]
+    df = df.drop(columns=columnas_a_eliminar, errors="ignore")
+
+    # Generar Marca si no existe
+    if "Marca" not in df.columns:
+        df["Marca"] = df["flota"].apply(lambda x: "CATERPILLAR" if 900 <= x <= 939 else "KOMATSU")
+
+    # Definir variables categóricas y numéricas
+    columnas_categoricas = ["Marca", "Componente", "Aceite Lubricante"]
+    columnas_numericas = [col for col in df.columns if col != "Criticidad" and col not in columnas_categoricas]
+
+    # Validar columnas críticas
+    for col in columnas_categoricas:
+        if col not in df.columns:
+            raise ValueError(f"Falta columna crítica: {col}")
+
+    return df, columnas_categoricas, columnas_numericas
+
+# Verificar si hay nuevos datos
+def debe_reentrenar():
+    if not os.path.exists(MODEL_PATH) or not os.path.exists(DATA_PATH):
+        return True
+    data_mtime = os.path.getmtime(DATA_PATH)
+    model_mtime = os.path.getmtime(MODEL_PATH)
+    return data_mtime > model_mtime
+
+# Entrenar modelo
+def entrenar_modelo():
+    try:
+        df = cargar_datos()
+        print("✅ Datos cargados correctamente.")
+    except Exception as e:
+        print(f"❌ Error al cargar los datos: {e}")
+        return
+
+    try:
+        df, columnas_categoricas, columnas_numericas = preprocesar_datos(df)
+    except Exception as e:
+        print(f"❌ Error durante el preprocesamiento: {e}")
+        return
+
+    if "Criticidad" not in df.columns:
+        print("❌ Error: No se encontró la columna 'Criticidad'.")
+        return
+
+    X = df.drop(columns=["Criticidad"])
+    y = df["Criticidad"]
+
+    if X.empty or y.empty:
+        print("❌ Error: No hay suficientes datos para entrenar el modelo.")
+        return
+
+    # Separar datos
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Transformador de características
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('num', StandardScaler(), columnas_numericas),
+            ('cat', OneHotEncoder(handle_unknown='ignore'), columnas_categoricas)
+        ])
+
+    # Modelo base
+    model = Pipeline(steps=[
+        ('preprocessor', preprocessor),
+        ('classifier', RandomForestClassifier(random_state=42))
+    ])
+
+    # Búsqueda de hiperparámetros
+    param_dist = {
+        'classifier__n_estimators': randint(50, 200),
+        'classifier__max_depth': randint(3, 10),
+        'classifier__min_samples_split': randint(2, 11),
+        'classifier__min_samples_leaf': randint(1, 5),
+        'classifier__class_weight': ['balanced', None]
+    }
+
+    rs = RandomizedSearchCV(model, param_dist, n_iter=30, cv=5, scoring='f1_weighted', n_jobs=-1, verbose=0)
+    rs.fit(X_train, y_train)
+
+    # Mejor modelo
+    best_model = rs.best_estimator_
+    y_pred = best_model.predict(X_test)
+
+    # Mostrar reporte de clasificación
+    print("\n📋 Reporte de Clasificación:")
+    print(classification_report(y_test, y_pred))
+
+    # Importancia de características
+    feature_names = columnas_numericas + list(
+        best_model.named_steps['preprocessor'].named_transformers_['cat']
+        .get_feature_names_out(columnas_categoricas)
+    )
+    joblib.dump(feature_names, FEATURES_PATH)
+    importancias = best_model.named_steps['classifier'].feature_importances_
+    feat_importance = pd.DataFrame({
+        "Característica": feature_names,
+        "Importancia": importancias
+    }).sort_values(by="Importancia", ascending=False).head(10)
+
+    print("\n📈 Importancia de Características:")
+    print(feat_importance)
+
+    # Guardar modelo y nombres de características
+    joblib.dump(best_model, MODEL_PATH)
+    joblib.dump(feature_names, FEATURES_PATH)
+    print(f"💾 Modelo guardado en {MODEL_PATH}")
+    print(f"💾 Nombres de características guardados en {FEATURES_PATH}")
+
+    # Guardar métricas
+    metricas = {
+        "mejor_params": rs.best_params_,
+        "mejor_score": rs.best_score_,
+        "accuracy": np.mean(y_pred == y_test)
+    }
+    guardar_metricas(metricas)
+
+# Guardar métricas del modelo
+def guardar_metricas(metricas):
+    """Guarda las métricas del modelo."""
+    metricas_df = pd.DataFrame([{
+        "mejor_params": str(metricas["mejor_params"]),
+        "mejor_score": metricas["mejor_score"],
+        "accuracy": metricas["accuracy"]
+    }])
+    if os.path.exists(METRICS_PATH):
+        metricas_previas = pd.read_csv(METRICS_PATH)
+        metricas_df = pd.concat([metricas_previas, metricas_df], ignore_index=True)
+    metricas_df.to_csv(METRICS_PATH, index=False)
+
+if __name__ == "__main__":
+    while True:
+        print("\n🔄 Iniciando proceso de entrenamiento...")
+        if debe_reentrenar():
+            start = time.time()
+            entrenar_modelo()
+            end = time.time()
+            print(f"⏱️ Entrenamiento completado en {round(end - start, 2)} segundos")
+        else:
+            print("ℹ️ No hay nuevos datos. Saltando reentrenamiento.")
+        print("⏳ Esperando 2 horas antes del próximo ciclo...\n")
+        time.sleep(7200)  # Ahora sí funciona ✅

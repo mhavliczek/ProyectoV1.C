@@ -1,0 +1,2 @@
+mejor_params,mejor_score,accuracy
+"{'classifier__class_weight': None, 'classifier__max_depth': 9, 'classifier__min_samples_leaf': 2, 'classifier__min_samples_split': 8, 'classifier__n_estimators': 144}",1.0,1.0

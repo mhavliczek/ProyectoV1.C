@@ -1,0 +1,6 @@
+freeze
+seaborn
+numpy
+matplotlib
+pandas
+streamlit
