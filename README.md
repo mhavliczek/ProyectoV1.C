@@ -1,2 +1,2 @@
-# ProyectoV1.0
+# ProyectoV1.B version emejorada
 Proyecto de Titulo Udla Analisis Tribologico
