@@ -453,6 +453,6 @@ with st.container():
         with col1 if i < len(detalles)//2 else col2:
             st.markdown(f"<div class='custom-metric'><b>{key}</b>: {value}</div>", unsafe_allow_html=True)
 
-# Footer
-st.markdown("---")
-st.caption("Dashboard de mantenimiento predictivo - Actualizado en tiempo real")
+    # Footer
+    st.markdown("---")
+    st.caption("Dashboard de mantenimiento predictivo - Actualizado en tiempo real")
