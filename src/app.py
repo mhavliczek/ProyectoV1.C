@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import joblib
 import os
 from datetime import datetime, timedelta
+from data_generator import generar_datos_disponibilidad, generar_datos_confiabilidad
 
 # Función para calcular alertas predictivas
 def calcular_alertas(registro):
@@ -231,7 +232,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Rutas de datos
-DATA_PATH = "data/datos_generados_Disponibilidad.parquet"
+DATA_PATH = "src/data/datos_generados_Disponibilidad.parquet"
 MODEL_PATH = "data/modelo_entrenado.joblib"
 FEATURES_PATH = "data/feature_names.joblib"
 
@@ -242,16 +243,50 @@ def get_safe_value(registro, key, default=0):
     except (ValueError, TypeError):
         return default
 
+# Función para asegurar que exista el directorio data
+def asegurar_directorio_data():
+    if not os.path.exists('src/data'):
+        os.makedirs('src/data')
+
+# Función para generar y guardar datos si no existen
+def generar_y_guardar_datos():
+    df_disponibilidad = generar_datos_disponibilidad()
+    df_confiabilidad = generar_datos_confiabilidad()
+    
+    asegurar_directorio_data()
+    
+    df_disponibilidad.to_parquet('src/data/datos_generados_Disponibilidad.parquet')
+    df_confiabilidad.to_parquet('data/metricas_confiabilidad.parquet')
+    
+    return df_disponibilidad
+
 # Carga de datos
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=300)
 def cargar_datos():
     try:
-        df = pd.read_parquet(DATA_PATH)
+        # Intentar cargar datos existentes
+        df = pd.read_parquet("src/data/datos_generados_Disponibilidad.parquet")
+        if df.empty:
+            raise FileNotFoundError
         return df
     except Exception as e:
-        st.error(f"Error al cargar los datos: {e}")
-        return pd.DataFrame()
+        st.warning("Generando nuevos datos de ejemplo...")
+        try:
+            return generar_y_guardar_datos()
+        except Exception as e:
+            st.error(f"Error al generar datos: {str(e)}")
+            # Crear un DataFrame vacío con las columnas necesarias
+            return pd.DataFrame({
+                'Marca': ['CATERPILLAR', 'KOMATSU'],
+                'Modelo': ['797F', '930E-4'],
+                'flota': ['CAEX_001', 'CAEX_002'],
+                'Disponibilidad': [0.9, 0.85],
+                'Tiempo Parada': [2, 3],
+                'Criticidad': ['Normal', 'Normal'],
+                'Fecha': [datetime.now(), datetime.now()]
+            })
 
+# Cargar datos
 df = cargar_datos()
 
 # Carga del modelo
@@ -295,20 +330,20 @@ registro = df_camion.iloc[0]
 with st.container():
     # Sección 1: KPIs Principales
     st.markdown("### 📊 Indicadores Clave")
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
+col1, col2, col3, col4 = st.columns(4)
+with col1:
         st.metric("Fallas Totales", 
                  len(df_camion[df_camion["Criticidad"] != "Normal"]),
                  delta="vs anterior")
-    with col2:
+with col2:
         st.metric("Camiones Disponibles", 
                  len(df_camion[df_camion["Disponibilidad"] > 0.9]),
                  delta="activos")
-    with col3:
+with col3:
         st.metric("MTTR (horas)", 
                  f"{round(df_camion['Tiempo Parada'].mean(), 2)}",
                  delta="promedio")
-    with col4:
+with col4:
         st.metric("Confiabilidad", 
                  f"{round(df_camion['Confiabilidad'].mean(), 2)}%",
                  delta="del sistema")
@@ -454,5 +489,5 @@ with st.container():
             st.markdown(f"<div class='custom-metric'><b>{key}</b>: {value}</div>", unsafe_allow_html=True)
 
     # Footer
-    st.markdown("---")
+st.markdown("---")
     st.caption("Dashboard de mantenimiento predictivo - Actualizado en tiempo real")

@@ -1,1 +1,1 @@
-web: streamlit run src/app.py 
+web: cd src && bash render_init.sh 
