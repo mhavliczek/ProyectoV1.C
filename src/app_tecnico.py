@@ -74,9 +74,12 @@ with col1:
     particulas = {
         "Hierro (Fe)": {"valor": df_unidad["Hierro (Fe) ppm"].iloc[-1], "limite": 120},
         "Cobre (Cu)": {"valor": df_unidad["Cobre (Cu) ppm"].iloc[-1], "limite": 40},
-        "Silicio (Si)": {"valor": df_unidad["Silicio (Si) ppm"].iloc[-1], "limite": 30},
-        "Aluminio (Al)": {"valor": df_unidad["Aluminio (Al) ppm"].iloc[-1], "limite": 25}
+        "Silicio (Si)": {"valor": df_unidad["Silicio (Si) ppm"].iloc[-1], "limite": 30}
     }
+    
+    # Agregar Aluminio solo si existe en el DataFrame
+    if "Aluminio (Al) ppm" in df_unidad.columns:
+        particulas["Aluminio (Al)"] = {"valor": df_unidad["Aluminio (Al) ppm"].iloc[-1], "limite": 25}
     
     for elemento, datos in particulas.items():
         valor = datos["valor"]

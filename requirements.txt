@@ -12,3 +12,7 @@ altair==5.5.0
 pillow==10.4.0
 protobuf==4.25.8
 faker==24.2.0
+markdown-it-py==3.0.0
+mdurl==0.1.2
+requests==2.32.3
+urllib3==2.4.0

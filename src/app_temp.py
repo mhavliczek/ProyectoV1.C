@@ -7,9 +7,6 @@ import os
 from datetime import datetime, timedelta
 from data_generator import generar_datos_disponibilidad, generar_datos_confiabilidad
 
-# Configurar el layout para usar todo el ancho de la pantalla
-st.set_page_config(layout="wide", page_title="Sistema de Mantenimiento Predictivo")
-
 # Asegurarse de que el directorio data existe y generar datos si es necesario
 if not os.path.exists('data'):
     os.makedirs('data')
@@ -156,9 +153,6 @@ def cargar_modelo():
     return None, None
 
 modelo, feature_names = cargar_modelo()
-
-# Cargar datos
-df = cargar_datos()
 
 # Título y descripción
 st.title("Sistema de Mantenimiento Predictivo")

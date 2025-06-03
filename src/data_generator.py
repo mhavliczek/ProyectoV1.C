@@ -110,14 +110,17 @@ def generar_datos_disponibilidad():
                 silicio = random.randint(0, 15)
                 hierro = random.randint(0, 100)
                 cobre = random.randint(0, 30)
+                aluminio = random.randint(0, 15)
             elif criticidad == "Atencion":
                 silicio = random.randint(15, 25)
                 hierro = random.randint(100, 200)
                 cobre = random.randint(30, 45)
+                aluminio = random.randint(15, 25)
             else:
                 silicio = random.randint(25, 40)
                 hierro = random.randint(200, 300)
                 cobre = random.randint(45, 60)
+                aluminio = random.randint(25, 35)
             
             # Calcular TBF y confiabilidad
             tbf = 24 - tiempo_parada if criticidad != "Critico" else 0
@@ -138,6 +141,7 @@ def generar_datos_disponibilidad():
                 'Hierro (Fe) ppm': hierro,
                 'Cobre (Cu) ppm': cobre,
                 'Silicio (Si) ppm': silicio,
+                'Aluminio (Al) ppm': aluminio,
                 'Viscosidad 100°C cSt(mm2/s)': random.uniform(12, 16),
                 'Contaminación (ppm)': random.uniform(0, 100),
                 'Temperatura (°C)': random.uniform(80, 95)
