@@ -5,4 +5,4 @@ export PATH="/usr/local/bin:$PATH"
 python src/data_generator.py
 
 # Iniciar la aplicación
-streamlit run src/app.py --server.port=$PORT --server.address=0.0.0.0 
+streamlit run src/app.py --server.port=$PORT --server.address=127.0.0.1 
