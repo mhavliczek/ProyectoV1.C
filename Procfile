@@ -1,1 +1,1 @@
-web: cd src && bash render_init.sh 
+web: cd src && mkdir -p data && python data_generator.py && streamlit run app.py 

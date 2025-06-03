@@ -173,11 +173,11 @@ if __name__ == "__main__":
     df_confiabilidad = generar_datos_confiabilidad()
     
     # Crear directorio data si no existe
-    if not os.path.exists('src/data'):
-        os.makedirs('src/data')
+    if not os.path.exists('data'):
+        os.makedirs('data')
     
     # Guardar datos
-    df_disponibilidad.to_parquet('src/data/datos_generados_Disponibilidad.parquet')
-    df_confiabilidad.to_parquet('src/data/metricas_confiabilidad.parquet')
+    df_disponibilidad.to_parquet('data/datos_generados_Disponibilidad.parquet')
+    df_confiabilidad.to_parquet('data/metricas_confiabilidad.parquet')
     
     print("Datos generados exitosamente") 
