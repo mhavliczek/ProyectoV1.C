@@ -5,12 +5,8 @@ import plotly.express as px
 import numpy as np
 from datetime import datetime, timedelta
 
-# Configuración de la página
-st.set_page_config(
-    page_title="Dashboard Técnico de Mantenimiento",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
+# Configurar el layout para usar todo el ancho de la pantalla
+st.set_page_config(layout="wide", page_title="Sistema de Mantenimiento Predictivo - Vista Técnica")
 
 # Estilos personalizados
 st.markdown("""
