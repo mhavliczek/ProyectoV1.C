@@ -7,6 +7,16 @@ import os
 from datetime import datetime, timedelta
 from data_generator import generar_datos_disponibilidad, generar_datos_confiabilidad
 
+# Asegurarse de que el directorio data existe y generar datos si es necesario
+if not os.path.exists('data'):
+    os.makedirs('data')
+    
+if not os.path.exists('data/datos_generados_Disponibilidad.parquet'):
+    df_disponibilidad = generar_datos_disponibilidad()
+    df_confiabilidad = generar_datos_confiabilidad()
+    df_disponibilidad.to_parquet('data/datos_generados_Disponibilidad.parquet')
+    df_confiabilidad.to_parquet('data/metricas_confiabilidad.parquet')
+
 # Función para calcular alertas predictivas
 def calcular_alertas(registro):
     alertas = []

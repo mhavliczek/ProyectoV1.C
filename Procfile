@@ -1,1 +1,1 @@
-web: cd src && mkdir -p data && python data_generator.py && streamlit run app.py 
+web: cd src && python -m streamlit run app.py --server.port $PORT --server.address 0.0.0.0 
