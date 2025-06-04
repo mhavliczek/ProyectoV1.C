@@ -11,7 +11,10 @@ st.set_page_config(layout="wide", page_title="Sistema de Mantenimiento Predictiv
 # Estilos personalizados
 st.markdown("""
     <style>
-        .main {background-color: #0e1117; color: #ffffff;}
+        .main {
+            background-color: #0e1117;
+            color: #ffffff;
+        }
         .stMetric {
             background-color: #1e2530;
             padding: 15px;
@@ -23,10 +26,49 @@ st.markdown("""
             padding: 20px;
             border-radius: 10px;
             margin: 10px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-        .parameter-critical {color: #ff4b4b !important;}
-        .parameter-warning {color: #ffa600 !important;}
-        .parameter-normal {color: #00cc66 !important;}
+        .parameter-critical {
+            color: #ff4b4b !important;
+            font-weight: bold;
+        }
+        .parameter-warning {
+            color: #ffa600 !important;
+            font-weight: bold;
+        }
+        .parameter-normal {
+            color: #00cc66 !important;
+            font-weight: bold;
+        }
+        .custom-metric {
+            background-color: #1e2530;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .custom-metric b {
+            color: #ffffff;
+            font-size: 1.1em;
+        }
+        /* Estilo para los contenedores */
+        div[data-testid="stVerticalBlock"] > div {
+            background-color: #1e2530;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        /* Estilo para los títulos */
+        h1, h2, h3 {
+            color: #ffffff !important;
+            font-weight: bold;
+        }
+        /* Estilo para los selectbox */
+        div[data-baseweb="select"] {
+            background-color: #262730;
+            border-radius: 5px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
