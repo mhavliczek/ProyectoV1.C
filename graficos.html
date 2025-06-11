@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gráficos de Disponibilidad - Flota de Camiones</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9; }
+        h1, h2 { color: #333; text-align: center; }
+        .plotly-graph-div { margin-bottom: 50px; }
+    </style>
+</head>
+<body>
+
+<h1>Gráficos de Disponibilidad - Flota de Camiones</h1>
+
+<!-- Gráfico 1 -->
+<h2>1. Disponibilidad promedio por marca</h2>
+<div id="grafico1" class="plotly-graph-div"></div>
+
+<!-- Gráfico 2 -->
+<h2>2. Distribución de criticidad</h2>
+<div id="grafico2" class="plotly-graph-div"></div>
+
+<!-- Gráfico 3 -->
+<h2>3. Tiempo promedio de parada por marca</h2>
+<div id="grafico3" class="plotly-graph-div"></div>
+
+<!-- Gráfico 4 -->
+<h2>4. Componentes más frecuentes con falla</h2>
+<div id="grafico4" class="plotly-graph-div"></div>
+
+<!-- Gráfico 5 -->
+<h2>5. Tendencia diaria de disponibilidad</h2>
+<div id="grafico5" class="plotly-graph-div"></div>
+
+<!-- Gráfico 6 -->
+<h2>6. Relación Criticidad vs Disponibilidad</h2>
+<div id="grafico6" class="plotly-graph-div"></div>
+
+<!-- Gráfico 7 -->
+<h2>7. Uso de aceites por componente</h2>
+<div id="grafico7" class="plotly-graph-div"></div>
+
+<!-- Gráfico 8 -->
+<h2>8. Porcentaje de camiones críticos por marca</h2>
+<div id="grafico8" class="plotly-graph-div"></div>
+
+<script>
+// Datos simulados basados en el CSV
+const data = {
+    disponibilidad_marca: {"CATERPILLAR": 75.5, "KOMATSU": 77.2},
+    criticidad: {"Normal": 79, "Atencion": 15, "Critico": 13},
+    tiempo_parada: {"CATERPILLAR": 5.5, "KOMATSU": 5.5},
+    componentes_fallas: {
+        "Transmisión": 25,
+        "Mando Final": 22,
+        "Motor": 18,
+        "Sistema Hidráulico": 10,
+        "Diferencial Del": 12
+    },
+    tendencia_disponibilidad: {
+        fechas: ["2025-04-01", "2025-04-05", "2025-04-10", "2025-04-15", "2025-04-20", "2025-04-25"],
+        disponibilidad: [76, 74, 77, 75, 76, 77]
+    },
+    criticidad_vs_disponibilidad: {
+        categorias: ["Critico", "Atencion", "Normal"],
+        disponibilidad: [65, 75, 85]
+    },
+    aceite_componente: {
+        componentes: ["Motor", "Transmisión", "Mando Final", "Sistema Hidráulico"],
+        "MOBIL MOBILTRANS HD 30": [10, 25, 15, 5],
+        "MOBIL SHC GEAR 680": [5, 0, 10, 0],
+        "MOBIL DTE 24": [0, 0, 0, 10]
+    },
+    criticidad_por_marca: {"CATERPILLAR": 12.5, "KOMATSU": 13.2}
+};
+
+// Gráfico 1: Disponibilidad promedio por marca
+Plotly.newPlot("grafico1", [{
+    x: Object.keys(data.disponibilidad_marca),
+    y: Object.values(data.disponibilidad_marca),
+    type: 'bar',
+    marker: {color: ['#1f77b4', '#ff7f0e']}
+}], {
+    title: "Disponibilidad Promedio por Marca (%)",
+    yaxis: { title: "Porcentaje de Disponibilidad" },
+    xaxis: { title: "Marca" }
+});
+
+// Gráfico 2: Distribución de criticidad
+Plotly.newPlot("grafico2", [{
+    x: Object.keys(data.criticidad),
+    y: Object.values(data.criticidad),
+    type: 'bar',
+    marker: {color: ['#d62728', '#ffbb78', '#2ca02c']}
+}], {
+    title: "Distribución de Criticidad",
+    yaxis: { title: "Número de Camiones" },
+    xaxis: { title: "Estado de Criticidad" }
+});
+
+// Gráfico 3: Tiempo promedio de parada por marca
+Plotly.newPlot("grafico3", [{
+    x: Object.keys(data.tiempo_parada),
+    y: Object.values(data.tiempo_parada),
+    type: 'bar',
+    marker: {color: ['#1f77b4', '#ff7f0e']}
+}], {
+    title: "Tiempo Promedio de Parada por Marca (horas)",
+    yaxis: { title: "Horas de Parada" },
+    xaxis: { title: "Marca" }
+});
+
+// Gráfico 4: Componentes más frecuentes con falla
+Plotly.newPlot("grafico4", [{
+    x: Object.values(data.componentes_fallas),
+    y: Object.keys(data.componentes_fallas),
+    type: 'bar',
+    orientation: 'h',
+    marker: {color: '#1f77b4'}
+}], {
+    title: "Top 5 Componentes con Mayor Incidencia de Falla",
+    xaxis: { title: "Cantidad de Fallas" },
+    yaxis: { title: "Componente" }
+});
+
+// Gráfico 5: Tendencia diaria de disponibilidad
+Plotly.newPlot("grafico5", [{
+    x: data.tendencia_disponibilidad.fechas,
+    y: data.tendencia_disponibilidad.disponibilidad,
+    type: 'line',
+    marker: {color: '#1f77b4'}
+}], {
+    title: "Tendencia Diaria de Disponibilidad (%)",
+    yaxis: { title: "Disponibilidad (%)" },
+    xaxis: { title: "Fecha" }
+});
+
+// Gráfico 6: Criticidad vs Disponibilidad
+Plotly.newPlot("grafico6", [{
+    x: data.criticidad_vs_disponibilidad.categorias,
+    y: data.criticidad_vs_disponibilidad.disponibilidad,
+    type: 'bar',
+    marker: {color: ['#d62728', '#ffbb78', '#2ca02c']}
+}], {
+    title: "Disponibilidad según Nivel de Criticidad",
+    yaxis: { title: "Disponibilidad (%)" },
+    xaxis: { title: "Nivel de Criticidad" }
+});
+
+// Gráfico 7: Aceite por componente
+const aceiteData = [];
+for (let aceite in data.aceite_componente) {
+    if (aceite !== "componentes") {
+        aceiteData.push({
+            name: aceite,
+            x: data.aceite_componente.componentes,
+            y: data.aceite_componente[aceite],
+            type: 'bar'
+        });
+    }
+}
+Plotly.newPlot("grafico7", aceiteData, {
+    barmode: 'stack',
+    title: "Uso de Aceites por Componente",
+    yaxis: { title: "Número de Registros" },
+    xaxis: { title: "Componente" }
+});
+
+// Gráfico 8: Camiones críticos por marca
+Plotly.newPlot("grafico8", [{
+    x: Object.keys(data.criticidad_por_marca),
+    y: Object.values(data.criticidad_por_marca),
+    type: 'bar',
+    marker: {color: '#d62728'}
+}], {
+    title: "Porcentaje de Camiones Críticos por Marca (%)",
+    yaxis: { title: "Porcentaje de Camiones Fuera de Servicio" },
+    xaxis: { title: "Marca" }
+});
+</script>
+
+</body>
+</html>
