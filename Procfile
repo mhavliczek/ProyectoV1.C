@@ -1,1 +1,0 @@
-web: cd src && python -m streamlit run app_tecnico.py --server.port $PORT --server.address 0.0.0.0 

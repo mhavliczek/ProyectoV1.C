@@ -1,0 +1,1 @@
+web: cd src && streamlit run app_Cuadro.py --server.port $PORT --server.address 0.0.0.0 
