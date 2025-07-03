@@ -6,15 +6,21 @@ import numpy as np
 
 st.set_page_config(page_title="Dashboard de Métricas Clave", layout="wide")
 
-# Ruta de los datos
-ARCHIVO_CSV = "src/data/datos_generados_completos.csv"
+# Ruta de los datos optimizada con Parquet
 ARCHIVO_PARQUET = "src/data/datos_generados_completos.parquet"
 
-# Leer datos
-if os.path.exists(ARCHIVO_PARQUET):
-    df = pd.read_parquet(ARCHIVO_PARQUET)
-else:
-    df = pd.read_csv(ARCHIVO_CSV)
+# Función cacheada para cargar datos desde Parquet (optimización de rendimiento)
+@st.cache_data(ttl=3600)  # Cache por 1 hora
+def cargar_datos_parquet():
+    if os.path.exists(ARCHIVO_PARQUET):
+        return pd.read_parquet(ARCHIVO_PARQUET)
+    else:
+        st.error(f"No se encontró el archivo de datos: {ARCHIVO_PARQUET}")
+        st.info("Asegúrate de que el archivo 'datos_generados_completos.parquet' esté en la carpeta 'src/data/'")
+        st.stop()
+
+# Leer datos optimizados
+df = cargar_datos_parquet()
 
 # Procesar fechas
 if "Fecha" in df.columns:
