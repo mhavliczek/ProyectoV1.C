@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: dashboard-cuadro
+    env: python
+    pythonVersion: "3.10.12"
+    buildCommand: |
+      python -m pip install --upgrade pip
+      pip install -r requirements-minimal.txt
+      chmod +x render_init.sh
+      ./render_init.sh
+    startCommand: cd src && streamlit run app_Cuadro.py --server.port $PORT --server.address 0.0.0.0
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: PYTHONPATH
+        value: src
+    healthCheckPath: /
+    autoDeploy: true 
