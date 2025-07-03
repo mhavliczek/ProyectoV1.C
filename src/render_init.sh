@@ -1,10 +1,20 @@
 #!/bin/bash
 
-# Crear directorio data dentro de src si no existe
-mkdir -p src/data
+# Script de inicialización para Render
+echo "Inicializando aplicación..."
 
-# Generar datos iniciales
-python data_generator.py
+# Crear directorio de datos si no existe
+mkdir -p data
 
-# Iniciar la aplicación
-streamlit run app.py 
+# Copiar archivos de datos si existen
+if [ -f "src/data/datos_generados_completos.parquet" ]; then
+    cp src/data/datos_generados_completos.parquet data/
+    echo "Archivo de datos copiado exitosamente"
+else
+    echo "Advertencia: No se encontró el archivo de datos"
+fi
+
+# Verificar que los archivos estén en su lugar
+ls -la data/
+
+echo "Inicialización completada" 

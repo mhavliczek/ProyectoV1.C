@@ -7,7 +7,7 @@ import numpy as np
 st.set_page_config(page_title="Dashboard de Métricas Clave", layout="wide")
 
 # Ruta de los datos optimizada con Parquet
-ARCHIVO_PARQUET = "src/data/datos_generados_completos.parquet"
+ARCHIVO_PARQUET = "data/datos_generados_completos.parquet"
 
 # Función cacheada para cargar datos desde Parquet (optimización de rendimiento)
 @st.cache_data(ttl=3600)  # Cache por 1 hora
