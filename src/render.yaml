@@ -2,13 +2,13 @@ services:
   - type: web
     name: dashboard-cuadro
     env: python
-    pythonVersion: "3.11.7"
+    pythonVersion: "3.11.5"
     buildCommand: |
       python -m pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
     startCommand: cd src && streamlit run app_Cuadro.py --server.port $PORT --server.address 0.0.0.0
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.7
+        value: 3.11.5
       - key: PYTHONPATH
         value: src 

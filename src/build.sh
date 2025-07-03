@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Forzar Python 3.11
-export PYTHON_VERSION=3.11.7
+export PYTHON_VERSION=3.11.5
 
 # Actualizar pip y setuptools primero
 python -m pip install --upgrade pip setuptools wheel
