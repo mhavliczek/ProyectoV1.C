@@ -7,8 +7,8 @@ import numpy as np
 st.set_page_config(page_title="Dashboard de Métricas Clave", layout="wide")
 
 # Ruta de los datos
-ARCHIVO_CSV = "data/datos_generados_completos.csv"
-ARCHIVO_PARQUET = "data/datos_generados_completos.parquet"
+ARCHIVO_CSV = "src/data/datos_generados_completos.csv"
+ARCHIVO_PARQUET = "src/data/datos_generados_completos.parquet"
 
 # Leer datos
 if os.path.exists(ARCHIVO_PARQUET):
@@ -390,11 +390,11 @@ df_kpis = pd.DataFrame({
         "Costo estimado por falla evitada x N° de fallas evitadas"
     ],
     "Meta": [
-        "≥ 95%",
-        "≥ 20%",
-        "≥ 15%",
+        "≥ 85%",
         "≥ 10%",
-        "≥ 80%",
+        "≥ 10%",
+        "≥ 5%",
+        "≥ 70%",
         "≥ Maximizar"
     ],
     "Periodicidad": [
